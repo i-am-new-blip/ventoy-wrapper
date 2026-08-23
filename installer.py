@@ -205,23 +205,23 @@ def install():
         fancy.write_text(win_wrapper)
 
     print('successfully installed')
+def main():
+    if __name__ == 'installer':
+      if globals().get('main',False):
+        if get_os() == "linux":
+            elevated_path = "/usr/bin/ventoy"
+        else:
+            elevated_path = r"C:\Windows\ventoy.cmd"
         
-if __name__ == 'installer':
-  if globals().get('main',False):
-    if get_os() == "linux":
-        elevated_path = "/usr/bin/ventoy"
-    else:
-        elevated_path = r"C:\Windows\ventoy.cmd"
-    
-    print(
-        "Asking for elevation because on %s will need to store @ %s, "
-        "which needs elevation."
-        % (get_os(), elevated_path)
-    )
-    
-    elevate()
-    install()
-      
-    import wrapper # run the big boy
+        print(
+            "Asking for elevation because on %s will need to store @ %s, "
+            "which needs elevation."
+            % (get_os(), elevated_path)
+        )
+        
+        elevate()
+        install()
+          
+        import wrapper # run the big boy
     
   
