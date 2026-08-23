@@ -253,7 +253,7 @@ def install():
     if get_os() == "linux":
         shebang = f"#!{sys.executable}\n"
         path = f"VentoyGUI.{get_arch()}"
-        base = "Path("/opt/ventoy")"
+        base = 'Path("/opt/ventoy")'
     else:
         path = "Ventoy2Disk.exe"
 
