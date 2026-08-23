@@ -52,6 +52,10 @@ def get_os():
     raise RuntimeError(f"Unsupported OS: {os.name}")
 
 def get_github(path):
+    p = Path(path)
+    if p.exists():
+        return p.read_text(encoding="utf-8")
+        
     url = "https://raw.githubusercontent.com/i-am-new-blip/ventoy-wrapper/main/%s" % path
 
     with urlopen(url) as r:
