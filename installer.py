@@ -247,6 +247,7 @@ def install():
     wrapper = get_github("wrapper.py")
     win_wrapper = get_github("ventoy.cmd")
     updater = get_github("updater.py")
+    installer = get_github("installer.py")
 
     shebang = ""
     base = "Path.home()"
@@ -265,6 +266,9 @@ def install():
 
     with open('updater.py', 'w', encoding="utf-8") as f:
         f.write(updater)
+
+    with open('installer.py', 'w', encoding="utf-8") as f:
+        f.write(installer) # self-duction, ME
 
     if get_os() == "linux":
         os.chmod("wrapper.py", 0o755)
