@@ -206,8 +206,6 @@ def install():
 
     print('successfully installed')
 def main():
-    if __name__ == 'installer':
-      if globals().get('main',False):
         if get_os() == "linux":
             elevated_path = "/usr/bin/ventoy"
         else:
