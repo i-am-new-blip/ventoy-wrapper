@@ -223,8 +223,8 @@ if __name__ == 'installer':
     )
     
     elevate()
-      
     install()
-    import updater
-    updater.update_check()
+      
+    import wrapper # run the big boy
+    
   
