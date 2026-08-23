@@ -1,5 +1,4 @@
-%s
-import os
+%simport os
 from path import Path
 import sys
 
