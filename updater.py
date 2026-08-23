@@ -7,4 +7,4 @@ def updater_check():
   
   if vers != cur_vers:
     print('updating')
-    install()
+    installer.install()
