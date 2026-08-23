@@ -301,7 +301,3 @@ def main():
     install()
 
     os.execvp("ventoy", ["ventoy"])
-
-
-if __name__ == "__main__":
-    main()
