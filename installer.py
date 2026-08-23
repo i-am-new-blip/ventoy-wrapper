@@ -1,13 +1,19 @@
-import os, platform, sys, subprocess, ctypes, tarfile, zipfile
+import ctypes
+import os
+import platform
+import subprocess
+import sys
+import tarfile
+import zipfile
 from pathlib import Path
-from bs4 import BeautifulSoup
 from urllib.request import urlopen
+
+from bs4 import BeautifulSoup
 
 OUTPUT = Path.home() / "ventoy"
 
 class ScrapingError(Exception):
     """Raised when Ventoy version/file scraping fails."""
-    pass
 
 def elevate():
     if os.name == "posix":
@@ -126,10 +132,9 @@ def download(url=None):
   home = Path.home()
   output = home / filename
     
-  with urlopen(url) as r:
-    with open(output, "wb") as f:
-      while chunk := r.read(1024 * 1024):
-        f.write(chunk)
+  with urlopen(url) as r, open(output, "wb") as f:
+    while chunk := r.read(1024 * 1024):
+      f.write(chunk)
 
   return output
 

@@ -1,5 +1,7 @@
+from pathlib import Path
+
 import installer
-from path import Path
+
 
 def updater_check():
   vers = installer.get_version()
