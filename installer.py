@@ -212,4 +212,4 @@ def main():
         elevate()
         install()
           
-        os.execvp('ventoy')
+        os.execvp('ventoy',['ventoy'])
