@@ -1,0 +1,49 @@
+name: Build Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Install dependencies
+        run: python -m pip install beautifulsoup4
+
+      - name: Build main.pyz
+        run: |
+          mkdir build
+
+          cp main_pyz.py build/__main__.py
+          cp installer.py build/
+          cp updater.py build/
+          cp wrapper.py build/
+          cp ventoy.cmd build/
+
+          python -m pip install --target build beautifulsoup4
+
+          python -m zipapp build \
+            -o main.pyz \
+            --compress
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            main.py
+            main.pyz
