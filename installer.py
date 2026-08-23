@@ -17,11 +17,21 @@ GITHUB_API = "https://api.github.com/repos/ventoy/Ventoy/releases/latest"
 class GitHubError(Exception):
     """Raised when fetching Ventoy's GitHub release fails."""
 
+def is_elevated():
+  if os.name == 'posix':
+    if os.geteuid() == 0:
+      return True
+    return False
+  elif os.name == 'nt':
+    if ctypes.windll.shell32.IsUserAnAdmin():
+      return True
+    return False
+  return None
 
 def elevate():
     if os.name == "posix":
         if os.geteuid() == 0:
-            return
+            return True
 
         subprocess.run(
             ["sudo", sys.executable, *sys.argv],
@@ -31,7 +41,7 @@ def elevate():
 
     elif os.name == "nt":
         if ctypes.windll.shell32.IsUserAnAdmin():
-            return
+            return True
 
         params = subprocess.list2cmdline(sys.argv)
 
@@ -288,15 +298,16 @@ def main():
     else:
         elevated_path = r"C:\Windows\ventoy.cmd"
 
-    print(
-        "\033[33m"
-        "Asking for elevation because on %s will need "
-        "to store @ %s, which needs elevation."
-        "\033[0m"
-        % (get_os(), elevated_path)
-    )
+    if not is_elevated():
 
-    elevate()
+    	print(
+          "\033[33mAsking for elevation because on %s will need "
+          "to store @ %s, which needs elevation."
+          "\033[0m"
+          % (get_os(), elevated_path)
+    	)
+
+	elevate()
 
     install()
 
