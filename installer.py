@@ -9,7 +9,7 @@ import zipfile
 from pathlib import Path
 from urllib.request import Request, urlopen
 
-OUTPUT = Path.home() / "ventoy"
+OUTPUT = Path("/opt/ventoy") if os.name == "posix" else Path.home() / "ventoy" # /root/ventoy fix
 
 GITHUB_API = "https://api.github.com/repos/ventoy/Ventoy/releases/latest"
 
