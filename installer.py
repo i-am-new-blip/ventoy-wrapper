@@ -260,6 +260,9 @@ def install():
     with open("wrapper.py", "w", encoding="utf-8") as f:
         f.write(wrapper % (shebang, path))
 
+    if get_os() == "linux":
+        os.chmod("wrapper.py", 0o755)
+
     with open("version.txt", "w", encoding="utf-8") as f:
         f.write(get_version())
 
