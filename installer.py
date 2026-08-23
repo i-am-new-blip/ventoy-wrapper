@@ -253,19 +253,17 @@ def install():
     installer = get_github("installer.py")
 
     shebang = ""
-    base = 'Path.home() / "ventoy"'
 
     if get_os() == "linux":
         shebang = f"#!{sys.executable}\n"
         path = f"VentoyGUI.{get_arch()}"
-        base = 'Path("/opt/ventoy")'
     else:
         path = "Ventoy2Disk.exe"
 
     os.chdir(OUTPUT)
 
     with open("wrapper.py", "w", encoding="utf-8") as f:
-        f.write(wrapper % (shebang, base, path))
+        f.write(wrapper % (shebang, 'Path(r"%s")'%OUTPUT, path))
 
     with open('updater.py', 'w', encoding="utf-8") as f:
         f.write(updater)
