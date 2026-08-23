@@ -1,7 +1,7 @@
-import requests, os, platform, sys, subprocess, ctypes
+import os, platform, sys, subprocess, ctypes, tarfile, zipfile
 from pathlib import Path
 from bs4 import BeautifulSoup
-import tarfile, zipfile
+from urllib.request import urlopen
 
 OUTPUT = Path.home() / "ventoy"
 
@@ -54,10 +54,8 @@ def get_os():
 def get_github(path):
     url = "https://raw.githubusercontent.com/i-am-new-blip/ventoy-wrapper/main/%s" % path
 
-    r = requests.get(url)
-    r.raise_for_status()
-
-    return r.text
+    with urlopen(url) as r:
+        return r.read().decode("utf-8")
 
 def get_arch():
     arch = platform.machine().lower()
@@ -77,10 +75,10 @@ def get_version():
   print('getting latest ventoy ver string')
   url = "https://sourceforge.net/projects/ventoy/files/"
   
-  r = requests.get(url)
-  r.raise_for_status()
+  with urlopen(url) as r:
+      text = r.read().decode("utf-8")
   
-  soup = BeautifulSoup(r.text, "html.parser")
+  soup = BeautifulSoup(text, "html.parser")
   
   row = soup.select_one("#files_list tbody tr")
   
@@ -102,10 +100,9 @@ def get_osfile(ver_url = None, os = None):
     os = get_os()
   
   print('scrapping the link of the ventoy zipped file')
-  r = requests.get(ver_url)
-  r.raise_for_status()
   
-  soup = BeautifulSoup(r.text, "html.parser")
+  with urlopen(url) as r:
+      soup = BeautifulSoup(r.read(), "html.parser")
   
   tbody = soup.select_one("tbody")
 
@@ -124,17 +121,13 @@ def download(url=None):
     url = get_osfile()
   print('downloading')
   filename = 'ventoy.zip' if 'tar' not in url else 'ventoy.tar.gz'
-  
-  r = requests.get(url, stream=True, allow_redirects=True)
-  r.raise_for_status()
 
-  
   home = Path.home()
   output = home / filename
-  
-  with open(output, "wb") as f:
-    for chunk in r.iter_content(chunk_size=1024 * 1024):
-      if chunk:
+    
+  with urlopen(url) as r:
+    with open(output, "wb") as f:
+      while chunk := r.read(1024 * 1024):
         f.write(chunk)
 
   return output
