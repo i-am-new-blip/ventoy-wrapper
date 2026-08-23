@@ -3,7 +3,7 @@ from pathlib import Path
 
 import sys
 
-base = %s / "ventoy"
+base = %s
 target = base / "%s"
   
 import updater

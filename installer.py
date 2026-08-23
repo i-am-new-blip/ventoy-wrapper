@@ -250,7 +250,7 @@ def install():
     installer = get_github("installer.py")
 
     shebang = ""
-    base = "Path.home()"
+    base = 'Path.home() / "ventoy"'
 
     if get_os() == "linux":
         shebang = f"#!{sys.executable}\n"
