@@ -44,7 +44,7 @@ def elevate():
         raise RuntimeError(f"Unsupported OS: {os.name}")
 
 def get_os():
-    print('getting os name')
+    
     if os.name == "nt":
         return "windows"
     if os.name == "posix":
@@ -76,7 +76,6 @@ def get_arch():
     raise RuntimeError("Unsupported architecture: %s" % arch)
 
 def get_version():
-  print('getting latest ventoy ver string')
   url = "https://sourceforge.net/projects/ventoy/files/"
   
   with urlopen(url) as r:
@@ -103,7 +102,6 @@ def get_osfile(ver_url = None, os = None):
   if os is None:
     os = get_os()
   
-  print('scrapping the link of the ventoy zipped file')
   
   with urlopen(ver_url) as r:
       soup = BeautifulSoup(r.read(), "html.parser")
@@ -123,7 +121,6 @@ def get_osfile(ver_url = None, os = None):
 def download(url=None):
   if url is None:
     url = get_osfile()
-  print('downloading')
   filename = 'ventoy.zip' if 'tar' not in url else 'ventoy.tar.gz'
 
   home = Path.home()
@@ -140,26 +137,23 @@ def extract(filename=None):
     
     if filename is None:
         filename = download()
-    print('extracting')
 
     OUTPUT.mkdir(parents=True, exist_ok=True)
     
     if filename.name.endswith(".tar.gz"):
-        # member.name.split('/')[1:] means to remove to top level folder (its raw -> removed_folder -> real contents)
         with tarfile.open(filename, "r:gz") as tar:
             for member in tar.getmembers():
                 member.name = "/".join(member.name.split("/")[1:])
                 if member.name:
                     tar.extract(member, OUTPUT)
     elif filename.suffix == ".zip":
-        # member.filename.split('/',1 ) means to remove to top level folder (its raw -> removed_folder -> real contents)
         with zipfile.ZipFile(filename) as z:
             for member in z.infolist():
                 parts = member.filename.split("/", 1)
-        
-                if len(parts) == 1:
+
+                if parts[1] == '':
                     continue
-        
+
                 member.filename = parts[1]
                 z.extract(member, OUTPUT)
 
@@ -172,7 +166,6 @@ def extract(filename=None):
 
 def install():
     extract()
-    print('installing')
     wrapper = get_github('wrapper.py')
     win_wrapper = get_github('ventoy.cmd')
     shebang = ''
@@ -204,7 +197,6 @@ def install():
         fancy = Path(os.environ["WINDIR"]) / "ventoy.cmd"
         fancy.write_text(win_wrapper)
 
-    print('successfully installed')
 def main():
         if get_os() == "linux":
             elevated_path = "/usr/bin/ventoy"
@@ -212,14 +204,12 @@ def main():
             elevated_path = r"C:\Windows\ventoy.cmd"
         
         print(
-            "Asking for elevation because on %s will need to store @ %s, "
-            "which needs elevation."
+            "\033[33mAsking for elevation because on %s will need to store @ %s, "
+            "which needs elevation.\033[0m"
             % (get_os(), elevated_path)
         )
         
         elevate()
         install()
           
-        import wrapper # run the big boy
-    
-  
+        os.execvp('ventoy')
