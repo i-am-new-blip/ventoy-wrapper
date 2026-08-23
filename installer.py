@@ -248,17 +248,19 @@ def install():
     win_wrapper = get_github("ventoy.cmd")
 
     shebang = ""
+    base = "Path.home()"
 
     if get_os() == "linux":
         shebang = f"#!{sys.executable}\n"
         path = f"VentoyGUI.{get_arch()}"
+        base = "/ \"opt\""
     else:
         path = "Ventoy2Disk.exe"
 
     os.chdir(OUTPUT)
 
     with open("wrapper.py", "w", encoding="utf-8") as f:
-        f.write(wrapper % (shebang, path))
+        f.write(wrapper % (shebang, base, path))
 
     if get_os() == "linux":
         os.chmod("wrapper.py", 0o755)
