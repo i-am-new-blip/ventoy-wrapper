@@ -214,13 +214,16 @@ def extract(filename=None):
     if filename.name.endswith(".tar.gz"):
         with tarfile.open(filename, "r:gz") as tar:
             for member in tar.getmembers():
-                parts = member.name.split("/", 1)
-
-                if len(parts) != 2 or not parts[1]:
+                # Strip the first directory component
+                p = Path(member.name)
+                if len(p.parts) <= 1:
                     continue
 
-                member.name = parts[1]
-                tar.extract(member, OUTPUT)
+                # Assign relative path without the top folder
+                member.name = str(Path(*p.parts[1:]))
+
+                # Extract directly into OUTPUT
+                tar.extract(member, OUTPUT, filter="data")
 
     elif filename.suffix == ".zip":
         with zipfile.ZipFile(filename) as z:
