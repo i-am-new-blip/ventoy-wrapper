@@ -17,16 +17,18 @@ GITHUB_API = "https://api.github.com/repos/ventoy/Ventoy/releases/latest"
 class GitHubError(Exception):
     """Raised when fetching Ventoy's GitHub release fails."""
 
+
 def is_elevated():
-  if os.name == 'posix':
-    if os.geteuid() == 0:
-      return True
-    return False
-  elif os.name == 'nt':
-    if ctypes.windll.shell32.IsUserAnAdmin():
-      return True
-    return False
-  return None
+    if os.name == "posix":
+        if os.geteuid() == 0:
+            return True
+        return False
+    elif os.name == "nt":
+        if ctypes.windll.shell32.IsUserAnAdmin():
+            return True
+        return False
+    return None
+
 
 def elevate():
     if os.name == "posix":
@@ -81,8 +83,7 @@ def get_github(*path):
 
     url = (
         "https://raw.githubusercontent.com/"
-        "i-am-new-blip/ventoy-wrapper/main/"
-        + "/".join(path)
+        "i-am-new-blip/ventoy-wrapper/main/" + "/".join(path)
     )
 
     req = Request(
@@ -125,9 +126,7 @@ def get_release():
         with urlopen(req) as r:
             return json.load(r)
     except Exception as e:
-        raise GitHubError(
-            f"Could not fetch latest Ventoy release: {e}"
-        ) from e
+        raise GitHubError(f"Could not fetch latest Ventoy release: {e}") from e
 
 
 def get_version():
@@ -147,9 +146,7 @@ def get_osfile(version=None, os=None):
     if version is not None:
         # If you ever want to support a specific release later.
         if version != release.get("tag_name"):
-            raise GitHubError(
-                "Requested version is not the latest release"
-            )
+            raise GitHubError("Requested version is not the latest release")
 
     if os is None:
         os = get_os()
@@ -178,20 +175,14 @@ def get_osfile(version=None, os=None):
 
         return asset["browser_download_url"]
 
-    raise GitHubError(
-        f"Could not find Ventoy {os} download"
-    )
+    raise GitHubError(f"Could not find Ventoy {os} download")
 
 
 def download(url=None):
     if url is None:
         url = get_osfile()
 
-    filename = (
-        "ventoy.tar.gz"
-        if url.endswith(".tar.gz")
-        else "ventoy.zip"
-    )
+    filename = "ventoy.tar.gz" if url.endswith(".tar.gz") else "ventoy.zip"
 
     output = Path.home() / filename
 
@@ -207,6 +198,7 @@ def download(url=None):
             f.write(chunk)
 
     return output
+
 
 def extract(filename=None):
     if filename is None:
@@ -300,14 +292,13 @@ def main():
 
     if not is_elevated():
 
-    	print(
-          "\033[33mAsking for elevation because on %s will need "
-          "to store @ %s, which needs elevation."
-          "\033[0m"
-          % (get_os(), elevated_path)
-    	)
+        print(
+            "\033[33mAsking for elevation because on %s will need "
+            "to store @ %s, which needs elevation."
+            "\033[0m" % (get_os(), elevated_path)
+        )
 
-	elevate()
+    elevate()
 
     install()
 
