@@ -105,7 +105,7 @@ def get_osfile(ver_url = None, os = None):
   
   print('scrapping the link of the ventoy zipped file')
   
-  with urlopen(url) as r:
+  with urlopen(ver_url) as r:
       soup = BeautifulSoup(r.read(), "html.parser")
   
   tbody = soup.select_one("tbody")
