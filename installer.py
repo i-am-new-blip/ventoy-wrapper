@@ -191,6 +191,9 @@ def install():
     with open('wrapper.py','w') as f:
         f.write(wrapper % (shebang, path))
 
+    with open('version.txt','w') as f:
+        f.write(get_version())
+    
     if get_os() == 'linux':
         local = Path.home() / ".local/bin/ventoy"
         local.parent.mkdir(parents=True, exist_ok=True)
