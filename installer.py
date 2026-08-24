@@ -13,11 +13,11 @@ OUTPUT = Path("/opt/ventoy") if os.name == "posix" else Path.home() / "ventoy" #
 
 GITHUB_API = "https://api.github.com/repos/ventoy/Ventoy/releases/latest"
 largest = 0
-
 class GitHubError(Exception):
     """Raised when fetching Ventoy's GitHub release fails."""
 
 def progress(value, message=""):
+    global largest
     value = max(0, min(100, value))
     width = 30
 
