@@ -27,7 +27,7 @@ def progress(value, message=""):
     if len(tbp) > largest:
         largest = len(tbp)
     print(
-        f"\r[{bar}] {value:3.0f}% {message}"+" "*(len(largest)-len(tbp)),
+        f"\r[{bar}] {value:3.0f}% {message}"+" "*(largest-len(tbp)),
         end="",
         flush=True
     )
