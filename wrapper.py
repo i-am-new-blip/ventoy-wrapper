@@ -10,4 +10,12 @@ import updater
 updater.updater_check()
   
 os.chdir(base)
-os.execv(target, [str(target), *sys.argv[1:]])
+if os.name == "nt":
+    import subprocess
+    subprocess.Popen(
+        [str(target), *sys.argv[1:]],
+        cwd=base,
+    )
+    sys.exit(0)
+else:
+    os.execv(str(target), [str(target), *sys.argv[1:]])
