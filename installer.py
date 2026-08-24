@@ -17,6 +17,18 @@ GITHUB_API = "https://api.github.com/repos/ventoy/Ventoy/releases/latest"
 class GitHubError(Exception):
     """Raised when fetching Ventoy's GitHub release fails."""
 
+def progress(value, message=""):
+    value = max(0, min(100, value))
+    width = 30
+
+    filled = round(width * value / 100)
+    bar = "=" * filled + " " * (width - filled)
+
+    print(
+        f"\r[{bar}] {value:3.0f}% {message}",
+        end="",
+        flush=True
+    )
 
 def is_elevated():
     if os.name == "posix":
@@ -141,7 +153,10 @@ def get_version():
 
 
 def get_osfile(version=None, os=None):
+    progress(1, "Getting latest Ventoy release")
     release = get_release()
+
+    progress(4, "Checking Ventoy release")
 
     if version is not None:
         # If you ever want to support a specific release later.
@@ -150,6 +165,8 @@ def get_osfile(version=None, os=None):
 
     if os is None:
         os = get_os()
+
+    progress(7, f"Finding Ventoy {os} download")
 
     if os == "linux":
         wanted = ".tar.gz"
@@ -173,6 +190,7 @@ def get_osfile(version=None, os=None):
         if os == "windows" and not name.endswith("-windows.zip"):
             continue
 
+        progress(10, "Found Ventoy download")
         return asset["browser_download_url"]
 
     raise GitHubError(f"Could not find Ventoy {os} download")
@@ -194,9 +212,22 @@ def download(url=None):
     print(f"Downloading {url}")
 
     with urlopen(req) as r, open(output, "wb") as f:
+        total = r.headers.get("Content-Length")
+        total = int(total) if total else None
+
+        downloaded = 0
+
         while chunk := r.read(1024 * 1024):
             f.write(chunk)
+            downloaded += len(chunk)
 
+            if total:
+                percent = 10 + 50 * downloaded / total
+                progress(percent, "Downloading Ventoy")
+            else:
+                progress(35, "Downloading Ventoy")
+
+    progress(60, "Download complete")
     return output
 
 
@@ -211,23 +242,33 @@ def extract(filename=None):
         exist_ok=True,
     )
 
+    progress(60, "Extracting Ventoy")
+
     if filename.name.endswith(".tar.gz"):
         with tarfile.open(filename, "r:gz") as tar:
-            for member in tar.getmembers():
-                # Strip the first directory component
+            members = tar.getmembers()
+            total = len(members)
+
+            for i, member in enumerate(members, 1):
                 p = Path(member.name)
+
                 if len(p.parts) <= 1:
                     continue
 
-                # Assign relative path without the top folder
                 member.name = str(Path(*p.parts[1:]))
-
-                # Extract directly into OUTPUT
                 tar.extract(member, OUTPUT, filter="data")
+
+                progress(
+                    60 + 10 * i / total,
+                    "Extracting Ventoy"
+                )
 
     elif filename.suffix == ".zip":
         with zipfile.ZipFile(filename) as z:
-            for member in z.infolist():
+            members = z.infolist()
+            total = len(members)
+
+            for i, member in enumerate(members, 1):
                 parts = member.filename.split("/", 1)
 
                 if len(parts) != 2 or not parts[1]:
@@ -236,21 +277,36 @@ def extract(filename=None):
                 member.filename = parts[1]
                 z.extract(member, OUTPUT)
 
+                progress(
+                    60 + 10 * i / total,
+                    "Extracting Ventoy"
+                )
+
     else:
         raise RuntimeError("Unsupported archive format")
 
     filename.unlink()
 
-    return filename.name.endswith(".tar.gz")
+    progress(70, "Extraction complete")
 
+    return filename.name.endswith(".tar.gz")
 
 def install():
     extract()
 
+    progress(71, "Downloading wrapper")
     wrapper = get_github("wrapper.py")
+    
+    progress(72, "Downloading Windows wrapper")
     win_wrapper = get_github("ventoy.cmd")
+    
+    progress(73, "Downloading updater")
     updater = get_github("updater.py")
+    
+    progress(74, "Downloading installer")
     installer = get_github("installer.py")
+    
+    progress(75, "Preparing wrapper")
 
     shebang = ""
 
@@ -262,15 +318,16 @@ def install():
 
     os.chdir(OUTPUT)
 
+    progress(76, "Writing wrapper")
     with open("wrapper.py", "w", encoding="utf-8") as f:
         f.write(wrapper % (shebang, 'Path(r"%s")'%OUTPUT, path))
-
+    progress(77, "Writing updater")
     with open('updater.py', 'w', encoding="utf-8") as f:
         f.write(updater)
-
+    progress(78, "Writing installer")
     with open('installer.py', 'w', encoding="utf-8") as f:
         f.write(installer) # self-duction, ME
-
+    progress(79, "Creating launcher")
     if get_os() == "linux":
         os.chmod("wrapper.py", 0o755)
 
@@ -284,16 +341,18 @@ def install():
             parents=True,
             exist_ok=True,
         )
-
+        progress(80, "Symlinking home wrapper")
         local.unlink(missing_ok=True)
         local.symlink_to(OUTPUT / "wrapper.py")
 
         system = Path("/usr/bin/ventoy")
 
+        progress(85, "Symlinking system wrapper")
         system.unlink(missing_ok=True)
         system.symlink_to(OUTPUT / "wrapper.py")
 
     else:
+        progress(85, "Symlinking system wrapper")
         fancy = Path(os.environ["WINDIR"]) / "ventoy.cmd"
         fancy.write_text(win_wrapper, encoding="utf-8")
 
@@ -315,5 +374,7 @@ def main():
     elevate()
 
     install()
+
+    progress(100, "Successfully installed Ventoy")
 
     os.execvp("ventoy", ["ventoy"])
