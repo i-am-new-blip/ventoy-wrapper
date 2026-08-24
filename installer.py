@@ -209,8 +209,6 @@ def download(url=None):
         headers={"User-Agent": "ventoy-wrapper"},
     )
 
-    print(f"Downloading {url}")
-
     with urlopen(req) as r, open(output, "wb") as f:
         total = r.headers.get("Content-Length")
         total = int(total) if total else None
@@ -371,7 +369,7 @@ def main():
             "\033[0m" % (get_os(), elevated_path)
         )
 
-    elevate()
+        elevate()
 
     install()
 
