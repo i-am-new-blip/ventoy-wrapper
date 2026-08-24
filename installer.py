@@ -12,7 +12,7 @@ from urllib.request import Request, urlopen
 OUTPUT = Path("/opt/ventoy") if os.name == "posix" else Path.home() / "ventoy" # /root/ventoy fix
 
 GITHUB_API = "https://api.github.com/repos/ventoy/Ventoy/releases/latest"
-
+largest = 0
 
 class GitHubError(Exception):
     """Raised when fetching Ventoy's GitHub release fails."""
@@ -23,9 +23,11 @@ def progress(value, message=""):
 
     filled = round(width * value / 100)
     bar = "=" * filled + " " * (width - filled)
-
+    tbp = f"\r[{bar}] {value:3.0f}% {message}"
+    if len(tbp) > largest:
+        largest = len(tbp)
     print(
-        f"\r[{bar}] {value:3.0f}% {message}",
+        f"\r[{bar}] {value:3.0f}% {message}"+" "*(len(largest)-len(tbp)),
         end="",
         flush=True
     )
@@ -122,7 +124,7 @@ def get_arch():
     if arch in ("mips64el",):
         return "mips64el"
 
-    raise RuntimeError("Unsupported architecture: %s" % arch)
+    raise RuntimeError(f"Unsupported architecture: {arch}")
 
 
 def get_release():
@@ -364,9 +366,9 @@ def main():
     if not is_elevated():
 
         print(
-            "\033[33mAsking for elevation because on %s will need "
-            "to store @ %s, which needs elevation."
-            "\033[0m" % (get_os(), elevated_path)
+            f"\033[33mAsking for elevation because on {get_os()} will need "
+            f"to store @ {elevated_path}, which needs elevation."
+            "\033[0m"
         )
 
         elevate()
