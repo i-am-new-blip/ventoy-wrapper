@@ -22,7 +22,7 @@ jobs:
         with:
           python-version: "3.14"
 
-      - name: Build main.pyz
+      - name: Prepare pyz
         run: |
           mkdir -p build/ext
 
@@ -33,8 +33,18 @@ jobs:
           cp ventoy.cmd build/ext/
           touch build/ext/__init__.py
 
+      - name: Build normal pyz
+        run: |
           python -m zipapp build \
             -o main.pyz \
+            --compress
+
+      - name: Build package pyz
+        run: |
+          sed -i 's/^INSTALLER_MANAGED = True$/INSTALLER_MANAGED = False/' build/ext/updater.py
+
+          python -m zipapp build \
+            -o package.pyz \
             --compress
 
       - name: Create GitHub Release

@@ -1,6 +1,6 @@
 import installer
 
-SELF_MANAGED=True
+INSTALLER_MANAGED=True
 
 def updater_check():
   ver = installer.get_version()
@@ -8,7 +8,7 @@ def updater_check():
 
   if ver != ventoy:
     print('updating')
-    if SELF_MANAGED:
+    if INSTALLER_MANAGED:
       installer.install()
     else:
       installer.extract()
