@@ -24,7 +24,7 @@ jobs:
 
       - name: Build main.pyz
         run: |
-          mkdir build
+          mkdir -p build/ext
 
           cp main_pyz.py build/__main__.py
           cp installer.py build/ext/
