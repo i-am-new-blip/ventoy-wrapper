@@ -8,10 +8,13 @@ import tarfile
 import zipfile
 from pathlib import Path
 from urllib.request import Request, urlopen
+from importlib.resources import files
 
 OUTPUT = Path("/opt/ventoy") if os.name == "posix" else Path.home() / "ventoy" # /root/ventoy fix
 
-GITHUB_API = "https://api.github.com/repos/ventoy/Ventoy/releases/latest"
+VENTOY_API = "https://api.github.com/repos/ventoy/Ventoy/releases/latest"
+WRAPPER_API= "https://api.github.com/repos/i-am-new-blip/ventoy-wrapper/releases/latest"
+
 largest = 0
 class GitHubError(Exception):
     """Raised when fetching Ventoy's GitHub release fails."""
@@ -89,11 +92,12 @@ def get_os():
     raise RuntimeError(f"Unsupported OS: {os.name}")
 
 
-def get_github(*path):
-    p = Path(*path)
+def get_github(path,get_local=False):
+    p = Path(path)
 
-    if p.exists():
-        return p.read_text(encoding="utf-8")
+    if get_local:
+        root = files("ext")
+        return root.joinpath(path).read_text()
 
     url = (
         "https://raw.githubusercontent.com/"
@@ -127,9 +131,9 @@ def get_arch():
     raise RuntimeError(f"Unsupported architecture: {arch}")
 
 
-def get_release():
+def get_release(api=VENTOY_API):
     req = Request(
-        GITHUB_API,
+        api,
         headers={
             "Accept": "application/vnd.github+json",
             "User-Agent": "ventoy-wrapper",
@@ -291,20 +295,20 @@ def extract(filename=None):
 
     return filename.name.endswith(".tar.gz")
 
-def install():
+def install(locally):
     extract()
-
-    progress(71, "Downloading wrapper")
-    wrapper = get_github("wrapper.py")
     
-    progress(72, "Downloading Windows wrapper")
-    win_wrapper = get_github("ventoy.cmd")
+    progress(71, "Getting wrapper")
+    wrapper = get_github("wrapper.py",locally)
     
-    progress(73, "Downloading updater")
-    updater = get_github("updater.py")
+    progress(72, "Getting Windows wrapper")
+    win_wrapper = get_github("ventoy.cmd",locally)
     
-    progress(74, "Downloading installer")
-    installer = get_github("installer.py")
+    progress(73, "Getting updater")
+    updater = get_github("updater.py",locally)
+    
+    progress(74, "Getting installer")
+    installer = get_github("installer.py",locally)
     
     progress(75, "Preparing wrapper")
 
@@ -329,10 +333,10 @@ def install():
         f.write(installer) # self-duction, ME
     progress(79, "Creating launcher")
     if get_os() == "linux":
-        os.chmod("wrapper.py", 0o755)
+        os.chmod("wrapper.py", 493)
 
     with open("version.txt", "w", encoding="utf-8") as f:
-        f.write(get_version())
+        f.write(f'{get_version()} : {get_version(WRAPPER_API)}')
 
     if get_os() == "linux":
         local = Path.home() / ".local/bin/ventoy"
@@ -355,9 +359,8 @@ def install():
         progress(85, "Symlinking system wrapper")
         fancy = Path(os.environ["WINDIR"]) / "ventoy.cmd"
         fancy.write_text(win_wrapper, encoding="utf-8")
-
-
-def main():
+        
+def main(locally=True):
     if get_os() == "linux":
         elevated_path = "/usr/bin/ventoy"
     else:
@@ -373,7 +376,7 @@ def main():
 
         elevate()
 
-    install()
+    install(locally)
 
     progress(100, "Successfully installed Ventoy")
 

@@ -27,10 +27,11 @@ jobs:
           mkdir build
 
           cp main_pyz.py build/__main__.py
-          cp installer.py build/
-          cp updater.py build/
-          cp wrapper.py build/
-          cp ventoy.cmd build/
+          cp installer.py build/ext/
+          cp updater.py build/ext/
+          cp wrapper.py build/ext/
+          cp ventoy.cmd build/ext/
+          touch build/ext/__init__.py
 
           python -m zipapp build \
             -o main.pyz \

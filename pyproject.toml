@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ventoy-wrapper"
+version = "3.0.0a1"
+description = "An unofficial installer and updater wrapper for Ventoy"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [
+    { name = "i-am-new-blip" }
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/i-am-new-blip/ventoy-wrapper"
+Repository = "https://github.com/i-am-new-blip/ventoy-wrapper"
+Issues = "https://github.com/i-am-new-blip/ventoy-wrapper/issues"

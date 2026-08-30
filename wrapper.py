@@ -14,11 +14,7 @@ if os.name == "nt":
     import subprocess, ctypes
     
     if not ctypes.windll.shell32.IsUserAnAdmin():
-        print(
-            f"\033[33mAsking for elevation because on {get_os()} will need "
-            f"to store @ {elevated_path}, which needs elevation."
-            "\033[0m"
-        )
+        print("\033[33mAsking for elevation because this program requires administrated priviliges\033[0m")
         
         params = subprocess.list2cmdline(sys.argv)
 
