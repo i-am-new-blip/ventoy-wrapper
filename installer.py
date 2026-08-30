@@ -131,7 +131,7 @@ def get_arch():
     raise RuntimeError(f"Unsupported architecture: {arch}")
 
 
-def get_release(api=VENTOY_API):
+def get_release(api):
     req = Request(
         api,
         headers={
@@ -147,8 +147,8 @@ def get_release(api=VENTOY_API):
         raise GitHubError(f"Could not fetch latest Ventoy release: {e}") from e
 
 
-def get_version():
-    release = get_release()
+def get_version(api=VENTOY_API):
+    release = get_release(api)
 
     version = release.get("tag_name")
 
