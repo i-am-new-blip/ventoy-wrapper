@@ -131,7 +131,7 @@ def get_arch():
     raise RuntimeError(f"Unsupported architecture: {arch}")
 
 
-def get_release(api):
+def get_release(api=VENTOY_API):
     req = Request(
         api,
         headers={
