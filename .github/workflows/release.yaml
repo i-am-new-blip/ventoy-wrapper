@@ -36,7 +36,7 @@ jobs:
       - name: Build normal pyz
         run: |
           python -m zipapp build \
-            -o main.pyz \
+            -o ventoy-wrapper.pyz \
             --compress
 
       - name: Build package pyz
@@ -44,11 +44,12 @@ jobs:
           sed -i 's/^INSTALLER_MANAGED = True$/INSTALLER_MANAGED = False/' build/ext/updater.py
 
           python -m zipapp build \
-            -o package.pyz \
+            -o ventoy-wrapper-standalone.pyz \
             --compress
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            main.pyz
+            ventoy-wrapper.pyz
+            ventoy-wrapper-standalone.pyz
