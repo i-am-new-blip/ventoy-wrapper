@@ -101,7 +101,7 @@ def get_github(path,get_local=False):
 
     url = (
         "https://raw.githubusercontent.com/"
-        "i-am-new-blip/ventoy-wrapper/main/" + "/".join(path)
+        "i-am-new-blip/ventoy-wrapper/main/" + p.as_posix()
     )
 
     req = Request(
